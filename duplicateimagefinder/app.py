@@ -106,7 +106,11 @@ class ImageUtils(object):
                 image = Image.open(image)
             except IOError:
                 return None
-        image = image.resize((8, 9), Image.ANTIALIAS).convert('L')
+        try:
+            image = image.resize((8, 9), Image.ANTIALIAS).convert('L')
+        except (IOError,SyntaxError) as e:
+            print("Error reading file " + str(filename) + ": " + str(e))
+            return None
         avg = reduce(lambda x, y: x + y, image.getdata()) / 64.
         avhash = reduce(lambda x, (y, z): x | (z << y),
                         enumerate(map(lambda i: 0 if i < avg else 1, image.getdata())),
